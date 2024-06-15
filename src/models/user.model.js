@@ -37,7 +37,7 @@ const userScheam = new mongoose.Schema(
         },
         watchHistory: [
             {
-                type: Schema.type.objectId,
+                type: Schema.Types.ObjectId,
                 ref: "Video",
             }
         ],
@@ -49,7 +49,7 @@ const userScheam = new mongoose.Schema(
 );
 
 userScheam.pre("save", async function(next) {
-    if(this.isModified("password")) return next();
+    if(!this.isModified("password")) return next();
 
     this.password = await bcrypt.hash(this.password, 10)
     next()
@@ -59,7 +59,7 @@ userScheam.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password)
 }
 
-userScheam.methods.generateaCCSESToken = function(){
+userScheam.methods.generateAccessToken = function(){
     return jwt.sign(
         {
             _id: this._id,
