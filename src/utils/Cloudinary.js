@@ -1,7 +1,26 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 
+function deleteImage(publicId) {
+    cloudinary.config({
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+    });
+    cloudinary.uploader.destroy(publicId, function(error, result) {
+      if (error) {
+        console.error('Error deleting image:', error);
+      } else {
+        console.log('Image deleted successfully:', result);
+      }
+    });
+  }
+
+
+
+
 const uploadOnCloudinary = async (locaFilePath) => {
+
     // Configuration
     cloudinary.config({
         cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -9,21 +28,33 @@ const uploadOnCloudinary = async (locaFilePath) => {
         api_secret: process.env.CLOUDINARY_API_SECRET,
     });
 
-     try {
+    try {
         if (!locaFilePath) return null;
+
+        // const response = await cloudinary.uploader.upload(locaFilePath, {
+        //     resource_type: "auto",
+        // });
+
+        // console.log(locaFilePath); 
+
         const response = await cloudinary.uploader.upload(locaFilePath, {
             resource_type: "auto",
         });
+
+
+        // console.log(response);
         // console.log("flie is uploaded on cloudinary", response.url);
         fs.unlinkSync(locaFilePath);
         return response;
     } catch (error) {
         fs.unlinkSync(locaFilePath); // remove flie
+        console.log(error);
         return null;
+
     }
 };
 
-export { uploadOnCloudinary };
+export { uploadOnCloudinary, deleteImage };
 
 // (async function() {
 
